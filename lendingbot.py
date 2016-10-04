@@ -309,7 +309,6 @@ def stringifyTotalLended():
 	timestampEnd = time.mktime(datetime.datetime.strptime(end, "%d/%m/%Y").timetuple())
 #	print(len(bot.returnLendingHistory(timestampStart,timestampEnd)))
 	earned = earnedTotal(bot.returnLendingHistory(timestampStart,timestampEnd))
-	lendingBalances = bot.returnAvailableAccountBalances("lending")['lending']
 #	earned = earnedTotal(bot.returnLendingHistory())
         log.log("Found "+str(len(bot.returnLendingHistory(timestampStart,timestampEnd)))+ " loans")
 #	print(timestampEnd)
@@ -321,25 +320,6 @@ def stringifyTotalLended():
 		log.updateStatusValue(key, "lentSum", totalLended[key])
 		log.updateStatusValue(key, "averageLendingRate", averageLendingRate)
 		log.updateStatusValue(key, "earnedTotal", earned[key])
-		#MaxToLend
-		activeCurTestNoDecBalance = lendingBalances[key]
-		activeCurTestBalance = Decimal(activeCurTestNoDecBalance)
-		if activeCur in totalLended:
-                	activeCurTestBalance += Decimal(totalLended[activeCur])
-                if key in coincfg and coincfg[key]['maxtolent'] != 0:
-			log.updateStatusValue(key, "maxToLend", coincfg[key]['maxtolent'])
-		if key in coincfg and coincfg[key]['maxtolent'] == 0 and coincfg[key]['maxpercenttolent'] != 0:
-			log.updateStatusValue(key, "maxToLend", (coincfg[key]['maxpercenttolent'] * activeCurTestBalance))
-                if key in coincfg and coincfg[key]['maxtolent'] == 0 and coincfg[key]['maxpercenttolent'] == 0:
-			log.updateStatusValue(key, "maxToLend", lendingBalances[key])
-		if(key not in coincfg and maxtolent != 0):
-			log.updateStatusValue(key, "maxToLend", maxtolent)
-		if(key not in coincfg and maxtolent == 0 and maxpercenttolent != 0):
-			log.updateStatusValue(key, "maxToLend", (maxpercenttolent * activeCurTestBalance))
-		if(key not in coincfg and maxtolent == 0 and maxpercenttolent == 0):
-			log.updateStatusValue(key, "maxToLend", lendingBalances[key])
-		#Display real total
-		log.updateStatusValue(key, "totalCoins", activeCurTestBalance)
 	return result
 
 def createLoanOffer(cur,amt,rate):
