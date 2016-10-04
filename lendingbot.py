@@ -157,11 +157,11 @@ if args.outputcurrency:
 else:
 	outputCurrency = 'BTC'
 if args.maxtolent:
-	maxtolent = args.maxtolent
+	maxtolent = Decimal(args.maxtolent)
 else:
 	maxtolent = 0
 if srgs.maxpercenttolent:
-	maxpercenttolent = args.maxpercenttolent
+	maxpercenttolent = Decimal(args.maxpercenttolent)/100
 else:
 	maxpercenttolent = 0
 #End handling args.
@@ -375,18 +375,18 @@ def cancelAndLoanAll():
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
                 if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0:
-                        if(lendingBalances[activeCur] > (activeCurTestBalance - coincfg[activeCur]['maxtolent']))
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - coincfg[activeCur]['maxtolent'])):
 				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - coincfg[activeCur]['maxtolent']))
                 if activeCur in coincfg and coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] != 0:
-                        if(lendingBalances[activeCur] > (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance)))
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance))):
 				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance)))
                 if activeCur in coincfg and coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] == 0:
 			activeBal = lendingBalances[activeCur]
 		if(activeCur not in coincfg and maxtolent != 0):
-                        if(lendingBalances[activeCur] > (activeCurTestBalance - maxtolent))
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - maxtolent)):
 				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - maxtolent))
 		if(activeCur not in coincfg and maxpercenttolent != 0):
-                        if(lendingBalances[activeCur] > (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance)))
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance))):
 				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance)))
 		if(activeCur not in coincfg and maxtolent == 0 and maxpercenttolent == 0):
 			activeBal = lendingBalances[activeCur]
