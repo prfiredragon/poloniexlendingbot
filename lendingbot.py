@@ -322,7 +322,7 @@ def stringifyTotalLended():
 		log.updateStatusValue(key, "averageLendingRate", averageLendingRate)
 		log.updateStatusValue(key, "earnedTotal", earned[key])
 		#MaxToLend
-		activeCurTestBalance = lendingBalances[key]
+		activeCurTestBalance = Decimal(lendingBalances[key])
 		if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
                 if key in coincfg and coincfg[key]['maxtolent'] != 0:
@@ -390,7 +390,7 @@ def cancelAndLoanAll():
 	while activeCurIndex < len(lendingBalances):
 		activeCur = lendingBalances.keys()[activeCurIndex]
 		activeCurIndex += 1
-                activeCurTestBalance = lendingBalances[activeCur]
+                activeCurTestBalance = Decimal(lendingBalances[activeCur])
 		activeBal = 0
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
