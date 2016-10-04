@@ -320,6 +320,7 @@ def stringifyTotalLended():
 		log.updateStatusValue(key, "lentSum", totalLended[key])
 		log.updateStatusValue(key, "averageLendingRate", averageLendingRate)
 		log.updateStatusValue(key, "earnedTotal", earned[key])
+		amountToLent(totalLended[key],key,0)
 	return result
 
 def createLoanOffer(cur,amt,rate):
