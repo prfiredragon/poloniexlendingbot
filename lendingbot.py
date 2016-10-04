@@ -401,12 +401,9 @@ def cancelAndLoanAll():
                 activeCurTestNoDecBalance = lendingBalances[activeCur]
 		activeCurTestBalance = Decimal(activeCurTestNoDecBalance)
 		activeBal = 0
-		print('activeCurTestBalance = '+str(activeCurTestBalance))
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
-		print('activeCurTestBalance = '+str(activeCurTestBalance))
                 activeBal = amountToLent(activeCurTestBalance,activeCur,lendingBalances[activeCur])
-		print('activeBal = '+str(activeBal))
 		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
 			usableCurrencies = 1
 		
