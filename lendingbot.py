@@ -310,7 +310,7 @@ def stringifyTotalLended():
 #	print(len(bot.returnLendingHistory(timestampStart,timestampEnd)))
 	earned = earnedTotal(bot.returnLendingHistory(timestampStart,timestampEnd))
 #	earned = earnedTotal(bot.returnLendingHistory())
-        log.log("Found "+str(len(bot.returnLendingHistory(timestampStart,timestampEnd)))+ " loans")
+        log.log("Found "+str(len(earned))+ " loans")
 #	print(timestampEnd)
 #	print(timestampStart)
 
@@ -391,7 +391,9 @@ def cancelAndLoanAll():
 		if type(lendingBalances) is list: #silly api wrapper, empty dict returns a list, which brakes the code later.
 			lendingBalances = {}
 		lendingBalances.update(onOrderBalances)
-	
+	if(len(lendingBalances) > 0):
+		print(lendingBalances)
+		print(lendingBalances['STR'])
 	activeCurIndex = 0
 	usableCurrencies = 0
 	global sleepTime #We need global var to edit sleeptime
