@@ -340,7 +340,7 @@ def createLoanOffer(cur,amt,rate):
 loanOrdersRequestLimit = {}
 defaultLoanOrdersRequestLimit = 200
 
-def amountToLent(activeCurTestBalance,activeCur,lendingBalance)
+def amountToLent(activeCurTestBalance,activeCur,lendingBalance):
 	activeBal = 0
 	if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0:
 		log.updateStatusValue(activeCur, "maxToLend", coincfg[activeCur]['maxtolent'])
