@@ -160,7 +160,7 @@ if args.maxtolent:
 	maxtolent = Decimal(args.maxtolent)
 else:
 	maxtolent = 0
-if srgs.maxpercenttolent:
+if args.maxpercenttolent:
 	maxpercenttolent = Decimal(args.maxpercenttolent)/100
 else:
 	maxpercenttolent = 0
