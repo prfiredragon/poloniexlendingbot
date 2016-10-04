@@ -1,10 +1,11 @@
 var localFile, reader;
 
+var Year = new Timespan("Year",365);
 var Hour = new Timespan("Hour",1/24);
 var Day = new Timespan("Day",1);
 var Week = new Timespan("Week",7);
 var Month = new Timespan("Month",30);
-var timespans = [Month, Week, Day, Hour];
+var timespans = [Year, Month, Week, Day, Hour];
 var Coin_Val = 1.00000000;
 var Coin = "BTC";
 
@@ -36,6 +37,7 @@ function updateRawValues(rawData){
     table.innerHTML = "";
     var currencies = Object.keys(rawData);
     var totalBTCEarnings = {};
+    var earnedTotalinBTC = 0.00000000;
     for (var keyIndex = 0; keyIndex < currencies.length; ++keyIndex)
     {
         var currency = currencies[keyIndex];
@@ -43,7 +45,16 @@ function updateRawValues(rawData){
         var lentSum = parseFloat(rawData[currency]['lentSum']);
         var totalCoins = parseFloat(rawData[currency]['totalCoins']);
         var highestBidBTC = parseFloat(rawData[currency]['highestBid']);
+        var earnedTotal = parseFloat(rawData[currency]['earnedTotal']);
         var couple = rawData[currency]['couple'];
+
+	if(!isNaN(earnedTotal)) {
+		if(currency == 'BTC') {
+        		earnedTotalinBTC += earnedTotal;
+        	} else {
+			earnedTotalinBTC += (earnedTotal * highestBidBTC);
+		}
+	}
 
         if(!isNaN(averageLendingRate) && !isNaN(lentSum) || !isNaN(totalCoins))
         {
@@ -109,7 +120,7 @@ function updateRawValues(rawData){
             var row = table.insertRow();
             if(lentSum > 0) {
                 var cell1 = row.appendChild(document.createElement("td"));
-                cell1.innerHTML = "<span class='hidden-xs'>"+ currency +"<br/></span>Estimated<br/>Earnings";
+                cell1.innerHTML = "<span class='hidden-xs'>"+ currency +"<br/></span>Estimated<br/>Earnings<br/><br><b>Earned Total: "+ printFloat(earnedTotal, 8)+ " "+ currency +"</b>";
                 var cell2 = row.appendChild(document.createElement("td"));
                 cell2.setAttribute("colspan", earningsColspan);
                 if(!isNaN(highestBidBTC)) {
@@ -124,24 +135,29 @@ function updateRawValues(rawData){
 
     // add headers
     var thead = table.createTHead();
+    var earnedTotalinCOIN = 0.00000000;
 
     // show account summary
     if(currencies.length > 1) {
         earnings = '';
+	
         timespans.forEach(function(timespan) {
 		if(Coin == "BTC") {
             		earnings += timespan.formatEarnings( Coin, totalBTCEarnings[timespan.name]);
+			earnedTotalinCOIN = earnedTotalinBTC;
 		}
 		if(Coin == "USDT") {
 			earnings += timespan.formatEarnings( Coin, totalBTCEarnings[timespan.name]*Coin_Val);
+			earnedTotalinCOIN = (earnedTotalinBTC*Coin_Val);
 		}
 		if(Coin != "BTC" && Coin != "USDT") {
 			earnings += timespan.formatEarnings( Coin, totalBTCEarnings[timespan.name]/Coin_Val);
+			earnedTotalinCOIN = (earnedTotalinBTC/Coin_Val);
 		}
         });
         var row = thead.insertRow(0);
         var cell = row.appendChild(document.createElement("th"));
-        cell.innerHTML = "Account<br/>Estimated<br/>Earnings";
+        cell.innerHTML = "Account<br/>Estimated<br/>Earnings<br/><br><b>Earned Total: "+ printFloat(earnedTotalinCOIN, 8)+ " "+ Coin +" </b>";
         cell.style.verticalAlign = "text-top";
         cell = row.appendChild(document.createElement("th"));
         cell.setAttribute("colspan", 2);
