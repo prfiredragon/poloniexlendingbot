@@ -104,7 +104,7 @@ parser.add_argument("-minloan", "--minloansize", help='Minimum size of offers to
 parser.add_argument("-json", "--jsonfile", help="Location of .json file to save log to")
 parser.add_argument("-jsonsize", "--jsonlogsize", help="How many lines to keep saved to the json log file")
 parser.add_argument("-server", "--startwebserver", help="If enabled, starts a webserver for the /www/ folder on 127.0.0.1:8000/lendingbot.html", action="store_true")
-parser.add_argument("-coincfg", "--coinconfig", help='Custom config per coin, useful when closing positions etc. Syntax: COIN:mindailyrate:maxactiveamount,COIN2:min2:maxactive2,...')
+parser.add_argument("-coincfg", "--coinconfig", help='Custom config per coin, useful when closing positions etc. Syntax: COIN:mindailyrate:maxactiveamount:maxtolent:maxpercenttolent,COIN2:min2:maxactive2:maxtolent:maxpercenttolent,...')
 parser.add_argument("-outcurr", "--outputcurrency", help="The currency that the HTML Overview will present the earnings summary in. Options are BTC, USDT, ETH or anything as long as it has a direct BTC market. The default is BTC.")
 parser.add_argument("-maxlent", "--maxtolent", help="Max amount to lent. if set to 0 the bot will check for maxpercenttolent.")
 parser.add_argument("-maxplent", "--maxpercenttolent", help="Max percent to lent. if set to 0 the bot will lent the 100%.")
@@ -151,7 +151,7 @@ if args.coinconfig:
 	coinconfig = args.coinconfig.split(',')
 	for cur in coinconfig:
 		cur = cur.split(':')
-		coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]))
+		coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]), maxtolent=Decimal(cur[3]), maxpercenttolent=(Decimal(cur[4]))/100)
 if args.outputcurrency:
 	outputCurrency = args.outputcurrency
 else:
@@ -223,7 +223,7 @@ if config_needed:
 		coinconfig = (json.loads(config.get("BOT","coinconfig")))
 		for cur in coinconfig:
 			cur = cur.split(':')
-			coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]))
+			coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]), maxtolent=Decimal(cur[3]), maxpercenttolent=(Decimal(cur[4]))/100)
 	except Exception as e:
 		pass
 sleepTime = sleepTimeActive #Start with active mode
