@@ -377,6 +377,7 @@ def cancelAndLoanAll():
 		print('activeCurTestBalance = '+str(activeCurTestBalance))
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
+		print('activeCurTestBalance = '+str(activeCurTestBalance))
                 if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0:
 			log.updateStatusValue(activeCur, "maxToLend", coincfg[activeCur]['maxtolent'])
                         if(lendingBalances[activeCur] > (activeCurTestBalance - coincfg[activeCur]['maxtolent'])):
