@@ -322,7 +322,7 @@ def stringifyTotalLended():
 		log.updateStatusValue(key, "averageLendingRate", averageLendingRate)
 		log.updateStatusValue(key, "earnedTotal", earned[key])
 		#MaxToLend
-		activeCurTestNoDecBalance = lendingBalances[activeCur]
+		activeCurTestNoDecBalance = lendingBalances[key]
 		activeCurTestBalance = Decimal(activeCurTestNoDecBalance)
 		if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
