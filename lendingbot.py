@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import io, sys, time, datetime, urllib2, json, argparse 
 import traceback
 from poloniex import Poloniex
