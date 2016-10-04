@@ -374,6 +374,7 @@ def cancelAndLoanAll():
                 activeCurTestNoDecBalance = lendingBalances[activeCur]
 		activeCurTestBalance = Decimal(activeCurTestNoDecBalance)
 		activeBal = 0
+		print('activeCurTestBalance = '+str(activeCurTestBalance))
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
                 if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0:
@@ -398,7 +399,7 @@ def cancelAndLoanAll():
 		if(activeCur not in coincfg and maxtolent == 0 and maxpercenttolent == 0):
 			log.updateStatusValue(activeCur, "maxToLend", lendingBalances[activeCur])
 			activeBal = lendingBalances[activeCur]
-
+		print('activeBal = '+str(activeBal))
 		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
 			usableCurrencies = 1
 		
