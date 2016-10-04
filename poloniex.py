@@ -172,3 +172,13 @@ class Poloniex:
     # Toggles the auto renew setting for the specified orderNumber
     def toggleAutoRenew(self, orderNumber):
         return self.api_query('toggleAutoRenew',{"orderNumber":orderNumber})
+
+    # Return History Lending
+    #def returnLendingHistory(self):
+    #    return self.api_query('returnLendingHistory')
+
+    #def returnLendingHistory(self,start,stop,limit):
+    #    return self.api_query('returnLendingHistory',{'start':start,'end':stop,'limit':limit})
+
+    def returnLendingHistory(self,start,stop):
+        return self.api_query('returnLendingHistory',{'start':start,'end':stop})
