@@ -205,6 +205,15 @@ if spreadLend < 1 or spreadLend > 20:
 	print "spreadlend value must be 1-20 range"
 	exit(1)
 
+def earnedTotal(json):
+	total = {}
+	for currency in json:
+		currencyType = currency['currency']
+		if total.has_key(currencyType):
+			total[currencyType] = total[currencyType]+float(currency['earned']);
+		else:
+			total[currencyType] = 0
+	return total
 
 def timestamp():
 	ts = time.time()
@@ -212,6 +221,7 @@ def timestamp():
 
 bot = Poloniex(apiKey, apiSecret)
 log = {}
+earned = {}
 
 # check if json output is enabled
 jsonOutputEnabled = (config.has_option('BOT', 'jsonfile') and config.has_option('BOT', 'jsonlogsize')) or (args.jsonfile and args.jsonlogsize) 
@@ -256,11 +266,24 @@ def refreshTotalLended():
 
 def stringifyTotalLended():
 	result = 'Lended: '
+	ts = time.time()
+	end = datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y')
+	start = '01/07/2015'
+	timestampStart = time.mktime(datetime.datetime.strptime(start, "%d/%m/%Y").timetuple())
+	timestampEnd = time.mktime(datetime.datetime.strptime(end, "%d/%m/%Y").timetuple())
+#	print(len(bot.returnLendingHistory(timestampStart,timestampEnd)))
+	earned = earnedTotal(bot.returnLendingHistory(timestampStart,timestampEnd))
+#	earned = earnedTotal(bot.returnLendingHistory())
+#	print(len(bot.returnLendingHistory(timestampStart,timestampEnd)))
+#	print(timestampEnd)
+#	print(timestampStart)
+
 	for key in sorted(totalLended):
 		averageLendingRate = Decimal(rateLended[key]*100/totalLended[key])
 		result += '[%.4f %s @ %.4f%%] ' % (Decimal(totalLended[key]), key, averageLendingRate)
 		log.updateStatusValue(key, "lentSum", totalLended[key])
 		log.updateStatusValue(key, "averageLendingRate", averageLendingRate)
+		log.updateStatusValue(key, "earnedTotal", earned[key])
 	return result
 
 def createLoanOffer(cur,amt,rate):
@@ -294,8 +317,13 @@ def cancelAndLoanAll():
 		for offer in loanOffers[cur]:
 			onOrderBalances[cur] = onOrderBalances.get(cur, 0) + Decimal(offer['amount'])
 			if dryRun == False:
-				msg = bot.cancelLoanOffer(cur,offer['id'])
-				log.cancelOrders(cur, msg)
+				try:
+					msg = bot.cancelLoanOffer(cur,offer['id'])
+					log.cancelOrders(cur, msg)
+				except Exception as e:
+					log.log("Error canceling loan offer: " + str(e))
+				#msg = bot.cancelLoanOffer(cur,offer['id'])
+				#log.cancelOrders(cur, msg)
 
 	lendingBalances = bot.returnAvailableAccountBalances("lending")['lending']
 	if dryRun == True: #just fake some numbers, if dryrun (testing)
@@ -401,7 +429,8 @@ def startWebServer():
 
 	try:
 		PORT = 8000
-		HOST = '127.0.0.1'
+		HOST = '0.0.0.0'
+		#'127.0.0.1'
 
 		class QuietHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			# quiet server logs
