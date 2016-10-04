@@ -53,10 +53,18 @@ minloansize = 0.001
 #AutoRenew - if set to 1 the bot will set the AutoRenew flag for the loans when you stop it (Ctrl+C) and clear the AutoRenew flag when on started
 autorenew = 0
 
-#custom config per coin, useful when closing positions etc.
-#syntax: ["COIN:mindailyrate:maxactiveamount",...]
+#Max amount to lent. if set to 0 or commented the bot will check for maxpercenttolent.
+#maxtolent = 0
+
+#Max percent to lent. if set to 0 or commented the bot will lent the 100%.
+#maxpercenttolent = 0
+
+#syntax: ["COIN:mindailyrate:maxactiveamount:maxtolent:maxpercenttolent",...]
 #if maxactive amount is 0 - stop lending this coin. in the future you'll be able to limit amount to be lent.
-#coinconfig = ["BTC:0.18:1","CLAM:0.6:1"]
+#if maxtolent is 0 - check for maxpercenttolent.
+#if maxpercenttolent is 0 - 100% is going to be lent.
+#coinconfig = ["BTC:0.18:1:0:0","CLAM:0.6:1:0:0"]
+
 
 #this option creates a json log file instead of console output which includes the most recent status
 #uncomment both jsonfile and jsonlogsize to enable
@@ -98,6 +106,8 @@ parser.add_argument("-jsonsize", "--jsonlogsize", help="How many lines to keep s
 parser.add_argument("-server", "--startwebserver", help="If enabled, starts a webserver for the /www/ folder on 127.0.0.1:8000/lendingbot.html", action="store_true")
 parser.add_argument("-coincfg", "--coinconfig", help='Custom config per coin, useful when closing positions etc. Syntax: COIN:mindailyrate:maxactiveamount,COIN2:min2:maxactive2,...')
 parser.add_argument("-outcurr", "--outputcurrency", help="The currency that the HTML Overview will present the earnings summary in. Options are BTC, USDT, ETH or anything as long as it has a direct BTC market. The default is BTC.")
+parser.add_argument("-maxlent", "--maxtolent", help="Max amount to lent. if set to 0 the bot will check for maxpercenttolent.")
+parser.add_argument("-maxplent", "--maxpercenttolent", help="Max percent to lent. if set to 0 the bot will lent the 100%.")
 args = parser.parse_args() #End args.
 #Start handling args.
 if args.apikey:
@@ -146,6 +156,14 @@ if args.outputcurrency:
 	outputCurrency = args.outputcurrency
 else:
 	outputCurrency = 'BTC'
+if args.maxtolent:
+	maxtolent = args.maxtolent
+else:
+	maxtolent = 0
+if srgs.maxpercenttolent:
+	maxpercenttolent = args.maxpercenttolent
+else:
+	maxpercenttolent = 0
 #End handling args.
 
 #Check if we need a config file at all (If all settings are passed by args, we won't)
@@ -193,6 +211,10 @@ if config_needed:
 	autorenew = int(config.get("BOT","autorenew"))
 	if(config.has_option('BOT', 'outputCurrency')):
 		outputCurrency = config.get('BOT', 'outputCurrency')
+	if(config.has_option('BOT', 'maxtolent')):
+		maxtolent = config.get('BOT', 'maxtolent')
+	if(config.has_option('BOT', 'maxpercenttolent')):
+		maxpercenttolent = config.get('BOT', 'maxpercenttolent')
 	if(config.has_option('BOT', 'minloansize')):
 		minLoanSize = Decimal(config.get("BOT",'minloansize'))
 	
@@ -349,7 +371,26 @@ def cancelAndLoanAll():
 	while activeCurIndex < len(lendingBalances):
 		activeCur = lendingBalances.keys()[activeCurIndex]
 		activeCurIndex += 1
-		activeBal = lendingBalances[activeCur]
+                activeCurTestBalance = lendingBalances[activeCur]
+                if activeCur in totalLended:
+                	activeCurTestBalance += Decimal(totalLended[activeCur])
+                if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0:
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - coincfg[activeCur]['maxtolent']))
+				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - coincfg[activeCur]['maxtolent']))
+                if activeCur in coincfg and coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] != 0:
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance)))
+				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance)))
+                if activeCur in coincfg and coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] == 0:
+			activeBal = lendingBalances[activeCur]
+		if(activeCur not in coincfg and maxtolent != 0):
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - maxtolent))
+				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - maxtolent))
+		if(activeCur not in coincfg and maxpercenttolent != 0):
+                        if(lendingBalances[activeCur] > (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance)))
+				activeBal = (lendingBalances[activeCur] - (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance)))
+		if(activeCur not in coincfg and maxtolent == 0 and maxpercenttolent == 0):
+			activeBal = lendingBalances[activeCur]
+
 		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
 			usableCurrencies = 1
 		
