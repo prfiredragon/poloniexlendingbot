@@ -387,8 +387,7 @@ def cancelAndLoanAll():
 		lendingBalances.update(onOrderBalances)
 	for key in sorted(totalLended):
 		if(len(lendingBalances) > 0 and key in lendingBalances):
-			print(lendingBalances)
-			print(lendingBalances[key])
+			#Wait for the (While)
 		else:
 			amountToLent(totalLended[key],key,0)
 			
