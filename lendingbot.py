@@ -339,7 +339,7 @@ def amountToLent(activeCurTestBalance,activeCur,lendingBalance):
 	if(activeCur not in coincfg and maxtolent == 0 and maxpercenttolent == 0):
 		log.updateStatusValue(activeCur, "maxToLend", activeCurTestBalance)
 		activeBal = lendingBalance
-return activeBal
+	return activeBal
 
 def cancelAndLoanAll():
 	loanOffers = bot.returnOpenLoanOffers()
