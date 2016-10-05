@@ -310,7 +310,7 @@ def stringifyTotalLended():
 #	print(len(bot.returnLendingHistory(timestampStart,timestampEnd)))
 	earned = earnedTotal(bot.returnLendingHistory(timestampStart,timestampEnd))
 #	earned = earnedTotal(bot.returnLendingHistory())
-        log.log("Found "+str(len(earned))+ " loans")
+        log.log("Found "+str(len(earnedTotal))+ " loans")
 #	print(timestampEnd)
 #	print(timestampStart)
 
