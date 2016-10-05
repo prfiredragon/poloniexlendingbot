@@ -397,8 +397,7 @@ def cancelAndLoanAll():
 	while activeCurIndex < len(lendingBalances):
 		activeCur = lendingBalances.keys()[activeCurIndex]
 		activeCurIndex += 1
-                activeCurTestNoDecBalance = lendingBalances[activeCur]
-		activeCurTestBalance = Decimal(activeCurTestNoDecBalance)
+		activeCurTestBalance = Decimal(lendingBalances[activeCur])
 		activeBal = 0
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
