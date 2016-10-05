@@ -412,7 +412,7 @@ def cancelAndLoanAll():
 		if activeCur in totalLended:
 			activePlusLended += Decimal(totalLended[activeCur])
 		#log total coin
-		log.updateStatusValue(activeCur, "totalCoins", (Decimal(lendingBalances[activeCur])+Decimal(totalLended[activeCur]))
+		log.updateStatusValue(activeCur, "totalCoins", (Decimal(lendingBalances[activeCur])+Decimal(totalLended[activeCur])))
 		if loansLength == 0:
 			createLoanOffer(activeCur,Decimal(activeBal)-lent,maxDailyRate)
 		for offer in loans['offers']:
