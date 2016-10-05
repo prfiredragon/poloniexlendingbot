@@ -393,7 +393,8 @@ def cancelAndLoanAll():
 		lendingBalances.update(onOrderBalances)
 	if(len(lendingBalances) > 0):
 		print(lendingBalances)
-		print(lendingBalances['STR'])
+		if('STR' in lendingBalances):
+			print(lendingBalances['STR'])
 	activeCurIndex = 0
 	usableCurrencies = 0
 	global sleepTime #We need global var to edit sleeptime
