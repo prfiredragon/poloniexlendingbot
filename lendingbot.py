@@ -320,7 +320,6 @@ def stringifyTotalLended():
 		log.updateStatusValue(key, "lentSum", totalLended[key])
 		log.updateStatusValue(key, "averageLendingRate", averageLendingRate)
 		log.updateStatusValue(key, "earnedTotal", earned[key])
-		amountToLent(totalLended[key],key,0)
 	return result
 
 def createLoanOffer(cur,amt,rate):
@@ -391,10 +390,13 @@ def cancelAndLoanAll():
 		if type(lendingBalances) is list: #silly api wrapper, empty dict returns a list, which brakes the code later.
 			lendingBalances = {}
 		lendingBalances.update(onOrderBalances)
-	if(len(lendingBalances) > 0):
-		print(lendingBalances)
-		if('STR' in lendingBalances):
-			print(lendingBalances['STR'])
+	for key in sorted(totalLended):
+		if(len(lendingBalances) > 0 and key in lendingBalances):
+			print(lendingBalances)
+			print(lendingBalances[key])
+		else:
+			amountToLent(totalLended[key],key,0)
+			
 	activeCurIndex = 0
 	usableCurrencies = 0
 	global sleepTime #We need global var to edit sleeptime
