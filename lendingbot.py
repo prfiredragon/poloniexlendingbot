@@ -243,6 +243,7 @@ if spreadLend < 1 or spreadLend > 20:
 
 def earnedTotal(json):
 	total = {}
+	log.log("Found "+str(len(json))+ " loans")
 	for currency in json:
 		currencyType = currency['currency']
 		if total.has_key(currencyType):
@@ -307,13 +308,7 @@ def stringifyTotalLended():
 	start = '01/07/2015'
 	timestampStart = time.mktime(datetime.datetime.strptime(start, "%d/%m/%Y").timetuple())
 	timestampEnd = time.mktime(datetime.datetime.strptime(end, "%d/%m/%Y").timetuple())
-#	print(len(bot.returnLendingHistory(timestampStart,timestampEnd)))
 	earned = earnedTotal(bot.returnLendingHistory(timestampStart,timestampEnd))
-#	earned = earnedTotal(bot.returnLendingHistory())
-        log.log("Found "+str(len(earnedTotal))+ " loans")
-#	print(timestampEnd)
-#	print(timestampStart)
-
 	for key in sorted(totalLended):
 		averageLendingRate = Decimal(rateLended[key]*100/totalLended[key])
 		result += '[%.4f %s @ %.4f%%] ' % (Decimal(totalLended[key]), key, averageLendingRate)
