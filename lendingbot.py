@@ -385,10 +385,10 @@ def cancelAndLoanAll():
 		if type(lendingBalances) is list: #silly api wrapper, empty dict returns a list, which brakes the code later.
 			lendingBalances = {}
 		lendingBalances.update(onOrderBalances)
+		
+	#Fill the (maxToLend) balances on the botlog.json for display it on the web
 	for key in sorted(totalLended):
-		if(len(lendingBalances) > 0 and key in lendingBalances):
-			#Wait for the (While)
-		else:
+		if(len(lendingBalances) = 0 or key not in lendingBalances):
 			amountToLent(totalLended[key],key,0)
 			
 	activeCurIndex = 0
