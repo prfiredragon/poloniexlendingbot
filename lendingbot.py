@@ -388,7 +388,7 @@ def cancelAndLoanAll():
 		
 	#Fill the (maxToLend) balances on the botlog.json for display it on the web
 	for key in sorted(totalLended):
-		if(len(lendingBalances) = 0 or key not in lendingBalances):
+		if(len(lendingBalances) == 0 or key not in lendingBalances):
 			amountToLent(totalLended[key],key,0)
 			
 	activeCurIndex = 0
