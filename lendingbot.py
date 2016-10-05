@@ -161,7 +161,7 @@ else:
 if args.maxpercenttolent:
 	maxpercenttolent = Decimal(args.maxpercenttolent)/100
 else:
-maxpercenttolent = 0
+	maxpercenttolent = 0
 #End handling args.
 
 #Check if we need a config file at all (If all settings are passed by args, we won't)
