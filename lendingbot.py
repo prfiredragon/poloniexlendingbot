@@ -65,7 +65,7 @@ autorenew = 0
 #if maxactive amount is 0 - stop lending this coin. in the future you'll be able to limit amount to be lent.
 #if maxtolent is 0 - check for maxpercenttolent.
 #if maxpercenttolent is 0 - 100% is going to be lent.
-if #maxtolentrate is set to more than 0 the maxtolent or maxpercenttolent will be used when then rate is less or equal to the maxtolentrate. if set to 0 the bot will use the maxtolent or maxpercenttolent all the time.
+if #maxtolentrate if set to more than 0 the maxtolent or maxpercenttolent will be used when then rate is less or equal to the maxtolentrate. if set to 0 the bot will use the maxtolent or maxpercenttolent all the time.
 #coinconfig = ["BTC:0.18:1:0:0:0","CLAM:0.6:1:0:0:0"]
 
 #this option creates a json log file instead of console output which includes the most recent status
@@ -110,6 +110,7 @@ parser.add_argument("-coincfg", "--coinconfig", help='Custom config per coin, us
 parser.add_argument("-outcurr", "--outputcurrency", help="The currency that the HTML Overview will present the earnings summary in. Options are BTC, USDT, ETH or anything as long as it has a direct BTC market. The default is BTC.")
 parser.add_argument("-maxlent", "--maxtolent", help="Max amount to lent. if set to 0 the bot will check for maxpercenttolent.")
 parser.add_argument("-maxplent", "--maxpercenttolent", help="Max percent to lent. if set to 0 the bot will lent the 100%.")
+parser.add_argument("-maxlentr", "--maxtolentrate", help="Max to lent rate. if set to more than 0 the maxtolent or maxpercenttolent will be used when then rate is less or equal to the maxtolentrate. if set to 0 the bot will use the maxtolent or maxpercenttolent all the time. The default is 0")
 args = parser.parse_args() #End args.
 #Start handling args.
 if args.apikey:
@@ -153,7 +154,7 @@ if args.coinconfig:
 	coinconfig = args.coinconfig.split(',')
 	for cur in coinconfig:
 		cur = cur.split(':')
-		coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]), maxtolent=Decimal(cur[3]), maxpercenttolent=(Decimal(cur[4]))/100)
+		coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]), maxtolent=Decimal(cur[3]), maxpercenttolent=(Decimal(cur[4]))/100, maxtolentrate=(Decimal(cur[5]))/100)
 if args.outputcurrency:
 	outputCurrency = args.outputcurrency
 else:
@@ -166,6 +167,10 @@ if args.maxpercenttolent:
 	maxpercenttolent = Decimal(args.maxpercenttolent)/100
 else:
 	maxpercenttolent = 0
+if args.maxtolentrate:
+	maxtolentrate = Decimal(args.maxtolentrate)/100
+else:
+	maxtolentrate = 0
 #End handling args.
 
 #Check if we need a config file at all (If all settings are passed by args, we won't)
@@ -217,6 +222,8 @@ if config_needed:
 		maxtolent = config.get('BOT', 'maxtolent')
 	if(config.has_option('BOT', 'maxpercenttolent')):
 		maxpercenttolent = config.get('BOT', 'maxpercenttolent')
+	if(config.has_option('BOT', 'maxtolentrate')):
+		maxtolentrate = config.get('BOT', 'maxtolentrate')
 	if(config.has_option('BOT', 'minloansize')):
 		minLoanSize = Decimal(config.get("BOT",'minloansize'))
 	
@@ -225,7 +232,7 @@ if config_needed:
 		coinconfig = (json.loads(config.get("BOT","coinconfig")))
 		for cur in coinconfig:
 			cur = cur.split(':')
-			coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]), maxtolent=Decimal(cur[3]), maxpercenttolent=(Decimal(cur[4]))/100)
+			coincfg[cur[0]] = dict(minrate=(Decimal(cur[1]))/100, maxactive=Decimal(cur[2]), maxtolent=Decimal(cur[3]), maxpercenttolent=(Decimal(cur[4]))/100, maxtolentrate=(Decimal(cur[5]))/100)
 	except Exception as e:
 		pass
 sleepTime = sleepTimeActive #Start with active mode
@@ -385,7 +392,6 @@ def cancelAndLoanAll():
 		activeBal = 0
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
-		activeBal = amountToLent(activeCurTestBalance,activeCur,Decimal(lendingBalances[activeCur]))
 		
 		#min daily rate can be changed per currency
 		curMinDailyRate = minDailyRate
@@ -399,10 +405,7 @@ def cancelAndLoanAll():
 		#log total coin
 		log.updateStatusValue(activeCur, "totalCoins", (Decimal(activeCurTestBalance)))
 
-		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
-			usableCurrencies = 1
-		else:
-			continue
+		
 		
 		# make sure we have a request limit for this currency
 		if(activeCur not in loanOrdersRequestLimit):
@@ -410,6 +413,16 @@ def cancelAndLoanAll():
 			
 		loans = bot.returnLoanOrders(activeCur, loanOrdersRequestLimit[activeCur] )
 		loansLength = len(loans['offers'])
+		
+		for offer in loans['offers']:
+			print(offer['rate'])
+		
+		activeBal = amountToLent(activeCurTestBalance,activeCur,Decimal(lendingBalances[activeCur]))
+		
+		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
+			usableCurrencies = 1
+		else:
+			continue
 
 		s = Decimal(0) #sum
 		i = int(0) #offer book iterator
