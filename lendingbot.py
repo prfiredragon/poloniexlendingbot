@@ -397,6 +397,7 @@ def cancelAndLoanAll():
 
 		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
 			usableCurrencies = 1
+		else:
 			continue
 		
 		# make sure we have a request limit for this currency
