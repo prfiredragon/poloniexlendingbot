@@ -328,11 +328,11 @@ defaultLoanOrdersRequestLimit = 200
 
 def amountToLent(activeCurTestBalance,activeCur,lendingBalance,lowrate):
 	restrictLent = False
-	if(activeCur in coincfg and coincfg[activeCur]['maxtolentrate'] == 0 or lowrate <= coincfg[activeCur]['maxtolentrate']):
-		log.log("Low Rate "+str(lowrate)+" vs conditional rate "+str(coincfg[activeCur]['maxtolentrate']))
+	if(activeCur in coincfg and coincfg[activeCur]['maxtolentrate'] == 0 or lowrate <= coincfg[activeCur]['maxtolentrate'] and lowrate > 0):
+		log.log("Low Rate "+str("%.8f" % Decimal(lowrate)*100)+" vs conditional rate "+str("%.8f" % Decimal(coincfg[activeCur]['maxtolentrate'])*100))
 		restrictLent = True
-	if(activeCur not in coincfg and maxtolentrate == 0 or lowrate <= maxtolentrate):
-		log.log("Low Rate "+str(lowrate)+" vs conditional rate "+str(maxtolentrate))
+	if(activeCur not in coincfg and maxtolentrate == 0 or lowrate <= maxtolentrate and lowrate > 0):
+		log.log("Low Rate "+str("%.8f" % Decimal(lowrate)*100)+" vs conditional rate "+str("%.8f" % Decimal(maxtolentrate)*100))
 		restrictLent = True
 	activeBal = Decimal(0)
 	if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0 and restrictLent == True:
