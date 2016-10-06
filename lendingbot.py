@@ -326,7 +326,11 @@ def createLoanOffer(cur,amt,rate):
 loanOrdersRequestLimit = {}
 defaultLoanOrdersRequestLimit = 200
 
-def amountToLent(activeCurTestBalance,activeCur,lendingBalance):
+def amountToLent(activeCurTestBalance,activeCur,lendingBalance,lowrate):
+	if activeCur in coincfg and coincfg[activeCur]['maxtolentrate'] != 0:
+		print("Low Rate "+str(lowrate)+" vs conditional rate"+str(coincfg[activeCur]['maxtolentrate']))
+	if(activeCur not in coincfg and maxtolentrate != 0):
+		print("Low Rate "+str(lowrate)+" vs conditional rate"+str(coincfg[activeCur]['maxtolentrate']))
 	activeBal = Decimal(0)
 	if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0:
 		log.updateStatusValue(activeCur, "maxToLend", coincfg[activeCur]['maxtolent'])
@@ -380,7 +384,7 @@ def cancelAndLoanAll():
 	#Fill the (maxToLend) balances on the botlog.json for display it on the web
 	for key in sorted(totalLended):
 		if(len(lendingBalances) == 0 or key not in lendingBalances):
-			amountToLent(totalLended[key],key,0)
+			amountToLent(totalLended[key],key,0,0)
 	
 	activeCurIndex = 0
 	usableCurrencies = 0
@@ -414,11 +418,7 @@ def cancelAndLoanAll():
 		loans = bot.returnLoanOrders(activeCur, loanOrdersRequestLimit[activeCur] )
 		loansLength = len(loans['offers'])
 		
-		#for offer in loans['offers']:
-		#	print(offer['rate'])
-		print(loans['offers'][0]['rate'])
-		
-		activeBal = amountToLent(activeCurTestBalance,activeCur,Decimal(lendingBalances[activeCur]))
+		activeBal = amountToLent(activeCurTestBalance,activeCur,Decimal(lendingBalances[activeCur]),Decimal(loans['offers'][0]['rate']))
 		
 		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
 			usableCurrencies = 1
