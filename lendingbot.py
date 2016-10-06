@@ -393,7 +393,7 @@ def cancelAndLoanAll():
 			log.log('Using custom mindailyrate ' + str(coincfg[activeCur]['minrate']*100) + '% for ' + activeCur)
 
 		#log total coin
-		log.updateStatusValue(activeCur, "totalCoins", (Decimal(lendingBalances[activeCur])+Decimal(totalLended[activeCur])))
+		log.updateStatusValue(activeCur, "totalCoins", (Decimal(activeCurTestBalance))
 
 		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
 			usableCurrencies = 1
