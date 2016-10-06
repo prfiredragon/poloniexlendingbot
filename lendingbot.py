@@ -414,8 +414,9 @@ def cancelAndLoanAll():
 		loans = bot.returnLoanOrders(activeCur, loanOrdersRequestLimit[activeCur] )
 		loansLength = len(loans['offers'])
 		
-		for offer in loans['offers']:
-			print(offer['rate'])
+		#for offer in loans['offers']:
+		#	print(offer['rate'])
+		print(loans['offers'][0]['rate'])
 		
 		activeBal = amountToLent(activeCurTestBalance,activeCur,Decimal(lendingBalances[activeCur]))
 		
