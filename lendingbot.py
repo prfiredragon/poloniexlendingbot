@@ -382,8 +382,13 @@ def cancelAndLoanAll():
                 if activeCur in totalLended:
                 	activeCurTestBalance += Decimal(totalLended[activeCur])
 		activeBal = amountToLent(activeCurTestBalance,activeCur,Decimal(lendingBalances[activeCur]))
+		
+		#log total coin
+		log.updateStatusValue(activeCur, "totalCoins", (Decimal(lendingBalances[activeCur])+Decimal(totalLended[activeCur])))
+
 		if float(activeBal) > minLoanSize: #Check if any currencies have enough to lend, if so, make sure sleeptimer is set to active.
 			usableCurrencies = 1
+			continue
 		
 		#min daily rate can be changed per currency
 		curMinDailyRate = minDailyRate
@@ -411,8 +416,6 @@ def cancelAndLoanAll():
 		activePlusLended = Decimal(activeBal)
 		if activeCur in totalLended:
 			activePlusLended += Decimal(totalLended[activeCur])
-		#log total coin
-		log.updateStatusValue(activeCur, "totalCoins", (Decimal(lendingBalances[activeCur])+Decimal(totalLended[activeCur])))
 		if loansLength == 0:
 			createLoanOffer(activeCur,Decimal(activeBal)-lent,maxDailyRate)
 		for offer in loans['offers']:
