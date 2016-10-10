@@ -65,7 +65,7 @@ autorenew = 0
 #if maxactive amount is 0 - stop lending this coin. in the future you'll be able to limit amount to be lent.
 #if maxtolent is 0 - check for maxpercenttolent.
 #if maxpercenttolent is 0 - 100% is going to be lent.
-if #maxtolentrate if set to more than 0 the maxtolent or maxpercenttolent will be used when then rate is less or equal to the maxtolentrate. if set to 0 the bot will use the maxtolent or maxpercenttolent all the time.
+#if maxtolentrate is set to more than 0 the maxtolent or maxpercenttolent will be used when then rate is less or equal to the maxtolentrate. if set to 0 the bot will use the maxtolent or maxpercenttolent all the time.
 #coinconfig = ["BTC:0.18:1:0:0:0","CLAM:0.6:1:0:0:0"]
 
 #this option creates a json log file instead of console output which includes the most recent status
@@ -219,11 +219,11 @@ if config_needed:
 	if(config.has_option('BOT', 'outputCurrency')):
 		outputCurrency = config.get('BOT', 'outputCurrency')
 	if(config.has_option('BOT', 'maxtolent')):
-		maxtolent = config.get('BOT', 'maxtolent')
+		maxtolent = Decimal(config.get('BOT', 'maxtolent'))
 	if(config.has_option('BOT', 'maxpercenttolent')):
-		maxpercenttolent = config.get('BOT', 'maxpercenttolent')
+		maxpercenttolent = Decimal(config.get('BOT', 'maxpercenttolent'))/100
 	if(config.has_option('BOT', 'maxtolentrate')):
-		maxtolentrate = config.get('BOT', 'maxtolentrate')
+		maxtolentrate = Decimal(config.get('BOT', 'maxtolentrate'))/100
 	if(config.has_option('BOT', 'minloansize')):
 		minLoanSize = Decimal(config.get("BOT",'minloansize'))
 	
@@ -328,37 +328,42 @@ defaultLoanOrdersRequestLimit = 200
 
 def amountToLent(activeCurTestBalance,activeCur,lendingBalance,lowrate):
 	restrictLent = False
-	if(activeCur in coincfg and coincfg[activeCur]['maxtolentrate'] == 0 and lowrate > 0 or lowrate <= coincfg[activeCur]['maxtolentrate'] and lowrate > 0):
-		log.log("Low Rate "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(coincfg[activeCur]['maxtolentrate'])*100))+"% "+activeCur)
-		restrictLent = True
-	if(activeCur not in coincfg and maxtolentrate == 0 and lowrate > 0 or lowrate <= maxtolentrate and lowrate > 0):
-		log.log("Low Rate "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(maxtolentrate)*100))+"% "+activeCur)
-		restrictLent = True
 	activeBal = Decimal(0)
-	if activeCur in coincfg and coincfg[activeCur]['maxtolent'] != 0 and restrictLent == True:
-		log.updateStatusValue(activeCur, "maxToLend", coincfg[activeCur]['maxtolent'])
-                if(lendingBalance > (activeCurTestBalance - coincfg[activeCur]['maxtolent'])):
-			activeBal = (lendingBalance - (activeCurTestBalance - coincfg[activeCur]['maxtolent']))
-        if activeCur in coincfg and coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] != 0 and restrictLent == True:
-		log.updateStatusValue(activeCur, "maxToLend", (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance))
-                if(lendingBalance > (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance))):
-			activeBal = (lendingBalance - (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance)))
-        if activeCur in coincfg and coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] == 0:
-		log.updateStatusValue(activeCur, "maxToLend", activeCurTestBalance)
-		activeBal = lendingBalance
-	if(activeCur not in coincfg and maxtolent != 0 and restrictLent == True):
-		log.updateStatusValue(activeCur, "maxToLend", maxtolent)
-                if(lendingBalance > (activeCurTestBalance - maxtolent)):
-			activeBal = (lendingBalance - (activeCurTestBalance - maxtolent))
-	if(activeCur not in coincfg and maxtolent == 0 and maxpercenttolent != 0 and restrictLent == True):
-		log.updateStatusValue(activeCur, "maxToLend", (maxpercenttolent * activeCurTestBalance))
-                if(lendingBalance > (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance))):
-			activeBal = (lendingBalance - (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance)))
-	if(activeCur not in coincfg and maxtolent == 0 and maxpercenttolent == 0):
-		log.updateStatusValue(activeCur, "maxToLend", activeCurTestBalance)
-		activeBal = lendingBalance
+	if (activeCur in coincfg):
+		if (coincfg[activeCur]['maxtolentrate'] == 0 and lowrate > 0 or lowrate <= coincfg[activeCur]['maxtolentrate'] and lowrate > 0):
+			log.log("Low Rate "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(coincfg[activeCur]['maxtolentrate'])*100))+"% "+activeCur)
+			restrictLent = True
+		if  coincfg[activeCur]['maxtolent'] != 0 and restrictLent == True:
+			log.updateStatusValue(activeCur, "maxToLend", coincfg[activeCur]['maxtolent'])
+                	if(lendingBalance > (activeCurTestBalance - coincfg[activeCur]['maxtolent'])):
+				activeBal = (lendingBalance - (activeCurTestBalance - coincfg[activeCur]['maxtolent']))
+        	if coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] != 0 and restrictLent == True:
+			log.updateStatusValue(activeCur, "maxToLend", (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance))
+                	if(lendingBalance > (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance))):
+				activeBal = (lendingBalance - (activeCurTestBalance - (coincfg[activeCur]['maxpercenttolent'] * activeCurTestBalance)))
+        	if coincfg[activeCur]['maxtolent'] == 0 and coincfg[activeCur]['maxpercenttolent'] == 0:
+			log.updateStatusValue(activeCur, "maxToLend", activeCurTestBalance)
+			activeBal = lendingBalance
+		
+	if (activeCur not in coincfg):
+		if(maxtolentrate == 0 and lowrate > 0 or lowrate <= maxtolentrate and lowrate > 0):
+                	log.log("Low Rate "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(maxtolentrate)*100))+"% "+activeCur)
+                	restrictLent = True
+		if(maxtolent != 0 and restrictLent == True):
+			log.updateStatusValue(activeCur, "maxToLend", maxtolent)
+                	if(lendingBalance > (activeCurTestBalance - maxtolent)):
+				activeBal = (lendingBalance - (activeCurTestBalance - maxtolent))
+		if(maxtolent == 0 and maxpercenttolent != 0 and restrictLent == True):
+			log.updateStatusValue(activeCur, "maxToLend", (maxpercenttolent * activeCurTestBalance))
+                	if(lendingBalance > (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance))):
+				activeBal = (lendingBalance - (activeCurTestBalance - (maxpercenttolent * activeCurTestBalance)))
+		if(maxtolent == 0 and maxpercenttolent == 0):
+			log.updateStatusValue(activeCur, "maxToLend", activeCurTestBalance)
+			activeBal = lendingBalance
 	if restrictLent == False:
 		log.updateStatusValue(activeCur, "maxToLend", activeCurTestBalance)
+		activeBal = lendingBalance
+	if((lendingBalance - activeBal) < 0.001):
 		activeBal = lendingBalance
 	return activeBal
 
