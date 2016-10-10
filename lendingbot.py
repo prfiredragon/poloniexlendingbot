@@ -329,9 +329,10 @@ defaultLoanOrdersRequestLimit = 200
 def amountToLent(activeCurTestBalance,activeCur,lendingBalance,lowrate):
 	restrictLent = False
 	activeBal = Decimal(0)
+	logdata = str("")
 	if (activeCur in coincfg):
 		if (coincfg[activeCur]['maxtolentrate'] == 0 and lowrate > 0 or lowrate <= coincfg[activeCur]['maxtolentrate'] and lowrate > 0):
-			log.log("Low Rate "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(coincfg[activeCur]['maxtolentrate'])*100))+"% "+activeCur)
+			logdata = ("The Lower Rate found on "+activeCur+" is "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(coincfg[activeCur]['maxtolentrate'])*100))+"%. ")
 			restrictLent = True
 		if  coincfg[activeCur]['maxtolent'] != 0 and restrictLent == True:
 			log.updateStatusValue(activeCur, "maxToLend", coincfg[activeCur]['maxtolent'])
@@ -347,7 +348,7 @@ def amountToLent(activeCurTestBalance,activeCur,lendingBalance,lowrate):
 		
 	if (activeCur not in coincfg):
 		if(maxtolentrate == 0 and lowrate > 0 or lowrate <= maxtolentrate and lowrate > 0):
-                	log.log("Low Rate "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(maxtolentrate)*100))+"% "+activeCur)
+                	logdata = ("The Lower Rate found on "+activeCur+" is "+str("%.4f" % (Decimal(lowrate)*100))+"% vs conditional rate "+str("%.4f" % (Decimal(maxtolentrate)*100))+"%. ")
                 	restrictLent = True
 		if(maxtolent != 0 and restrictLent == True):
 			log.updateStatusValue(activeCur, "maxToLend", maxtolent)
@@ -365,6 +366,8 @@ def amountToLent(activeCurTestBalance,activeCur,lendingBalance,lowrate):
 		activeBal = lendingBalance
 	if((lendingBalance - activeBal) < 0.001):
 		activeBal = lendingBalance
+	if(activeBal < lendingBalance):
+		log.log(logdata+" Lending "+str("%.8f" % Decimal(activeBal))+" of "+str("%.8f" % Decimal(lendingBalance))+" Available")
 	return activeBal
 
 def cancelAndLoanAll():
